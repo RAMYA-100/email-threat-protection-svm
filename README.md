@@ -19,50 +19,84 @@ A Python-based machine learning system that uses Support Vector Machine (SVM) cl
 
 # program 
 ```
-import pandas as pd 
-from sklearn.model_selection import train_test_split 
-from sklearn.feature_extraction.text import TfidfVectorizer 
-from sklearn.svm import SVC 
-from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score,confusion_matrix 
- 
-data = { 
-    'Email': [ 
-        'Free money offer now', 
-        'Please find the attached report', 
-        'Urgent: Claim your prize', 
-        'Meeting at 3 PM', 
-        'Win a brand new car!', 
-        'Let\'s schedule a call', 
-        'Congratulations! You are a winner', 
-        'Update your account details' 
-    ], 
-    'Label': [1, 0, 1, 0, 1, 0, 1, 1] 
-} 
- 
-df = pd.DataFrame(data) 
-vectorizer = TfidfVectorizer(stop_words='english')
-X = vectorizer.fit_transform(df['Email']) 
-y = df['Label'] 
-                                                                               
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42) 
- 
-svm_model = SVC(kernel='linear', random_state=42) 
-svm_model.fit(X_train, y_train) 
+import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.svm import SVC
+from sklearn.metrics import (
+    accuracy_score,
+    precision_score,
+    recall_score,
+    f1_score,
+    confusion_matrix
+)
 
-y_pred = svm_model.predict(X_test) 
+email_data = {
+    'Message': [
+        'Free money offer now',
+        'Please find the attached report',
+        'Urgent: Claim your prize',
+        'Meeting at 3 PM',
+        'Win a brand new car!',
+        'Let\'s schedule a call',
+        'Congratulations! You are a winner',
+        'Update your account details'
+    ],
+    'Threat': [1, 0, 1, 0, 1, 0, 1, 1]
+}
 
-accuracy = accuracy_score(y_test, y_pred) 
-precision = precision_score(y_test, y_pred) 
-recall = recall_score(y_test, y_pred) 
-f1 = f1_score(y_test, y_pred) 
 
-print(f"Accuracy: {accuracy:.2f}") 
-print(f"Precision: {precision:.2f}") 
-print(f"Recall: {recall:.2f}") 
-print(f"F1-Score: {f1:.2f}") 
+email_df = pd.DataFrame(email_data)
 
-conf_matrix = confusion_matrix(y_test, y_pred) 
-print(f"Confusion Matrix:\n{conf_matrix}")
+print("Class Balance:")
+print(email_df['Threat'].value_counts())
+
+text_converter = TfidfVectorizer(stop_words='english')
+features = text_converter.fit_transform(email_df['Message'])
+
+target = email_df['Threat']
+
+
+train_x, test_x, train_y, test_y = train_test_split(
+    features,
+    target,
+    test_size=0.2,
+    random_state=42
+)
+
+
+email_classifier = SVC(kernel='linear', random_state=42)
+email_classifier.fit(train_x, train_y)
+
+
+predicted_labels = email_classifier.predict(test_x)
+
+
+print("\nModel Performance")
+print("Accuracy :", round(accuracy_score(test_y, predicted_labels), 2))
+print("Precision:", round(precision_score(test_y, predicted_labels), 2))
+print("Recall   :", round(recall_score(test_y, predicted_labels), 2))
+print("F1 Score :", round(f1_score(test_y, predicted_labels), 2))
+
+
+matrix = confusion_matrix(test_y, predicted_labels)
+print("\nConfusion Matrix:")
+print(matrix)
+
+test_messages = email_df.iloc[test_y.index]['Message'].values
+
+print("\nMisclassified Emails:")
+found = False
+
+for msg, actual, predicted in zip(test_messages, test_y, predicted_labels):
+    if actual != predicted:
+        found = True
+        print(f"Email: {msg}")
+        print(f"Actual: {actual}, Predicted: {predicted}\n")
+
+if not found:
+    print("No misclassified emails.")
 ```
 # Output
-<img width="402" height="157" alt="image" src="https://github.com/user-attachments/assets/2d6e1a54-93cf-4f8c-9011-2c01a7072d9e" />
+<img width="590" height="486" alt="Screenshot 2026-06-30 200158" src="https://github.com/user-attachments/assets/27efb051-20e4-49da-9863-9f4da1a2f715" />
+
