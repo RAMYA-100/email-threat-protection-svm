@@ -1,5 +1,13 @@
 # email-threat-protection-svm
-A Python-based machine learning system that uses Support Vector Machine (SVM) classification to detect and filter potential cyber threat emails. The project helps protect consumers by improving email security while ensuring smooth communication and uninterrupted workflow through intelligent email analysis and automated threat identification.
+
+A machine learning system that classifies emails as safe or potential threats using Support Vector Machine (SVM) classification.
+
+
+## Dataset
+UCI SMS Spam Collection — 5,572 real labeled messages (4,825 ham, 747 spam)
+
+## Tech Stack
+Python, Scikit-learn, Pandas, TF-IDF Vectorizer, SVM (Linear Kernel)
 
 # Equipments :
 1.Hardware – PCs
@@ -7,15 +15,15 @@ A Python-based machine learning system that uses Support Vector Machine (SVM) cl
 2.Anaconda – Python 3.7 Installation / Jupyter notebook
 
 # Algorithm: 
-1.Load the email dataset using pandas.
+1. Loads real email dataset
 
-2.Preprocess email data and remove missing values.
+2. Converts text to numerical features using TF-IDF
 
-3.Split data into training and testing sets.
-
-4.Predict whether emails are safe or threats.
-
-5.Evaluate and save the trained model.
+3. Trains a linear SVM classifier
+ 
+4. Evaluates using accuracy, precision, recall, F1 and confusion matrix
+ 
+5. Prints misclassified emails for error analysis
 
 # program 
 
@@ -85,4 +93,13 @@ if not found:
 # Output
 <img width="1653" height="717" alt="image" src="https://github.com/user-attachments/assets/1a38fe5f-bd8f-43e7-8ef0-d553f4a3f03b" />
 
+
+# Output
+Trained SVM classifier on UCI SMS Spam Collection dataset (5,572 samples). Achieved 97% accuracy and 90% F1-score using TF-IDF vectorization with linear kernel SVM.
+| Metric    | Score |
+|-----------|-------|
+| Accuracy  | 97%   |
+| Precision | 97%   |
+| Recall    | 84%   |
+| F1 Score  | 90%   |
 
