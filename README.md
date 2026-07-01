@@ -18,6 +18,7 @@ A Python-based machine learning system that uses Support Vector Machine (SVM) cl
 5.Evaluate and save the trained model.
 
 # program 
+
 ```
 import pandas as pd
 from sklearn.model_selection import train_test_split
@@ -31,72 +32,57 @@ from sklearn.metrics import (
     confusion_matrix
 )
 
-email_data = {
-    'Message': [
-        'Free money offer now',
-        'Please find the attached report',
-        'Urgent: Claim your prize',
-        'Meeting at 3 PM',
-        'Win a brand new car!',
-        'Let\'s schedule a call',
-        'Congratulations! You are a winner',
-        'Update your account details'
-    ],
-    'Threat': [1, 0, 1, 0, 1, 0, 1, 1]
-}
-
-
-email_df = pd.DataFrame(email_data)
+email_df = pd.read_csv("spam.csv", encoding='latin-1')[['v1', 'v2']]
+email_df.columns = ['Threat', 'Message']
 
 print("Class Balance:")
 print(email_df['Threat'].value_counts())
 
 text_converter = TfidfVectorizer(stop_words='english')
 features = text_converter.fit_transform(email_df['Message'])
-
 target = email_df['Threat']
 
-
 train_x, test_x, train_y, test_y = train_test_split(
-    features,
-    target,
-    test_size=0.2,
-    random_state=42
+    features, target, test_size=0.2, random_state=42
 )
-
 
 email_classifier = SVC(kernel='linear', random_state=42)
 email_classifier.fit(train_x, train_y)
 
-
 predicted_labels = email_classifier.predict(test_x)
-
 
 print("\nModel Performance")
 print("Accuracy :", round(accuracy_score(test_y, predicted_labels), 2))
-print("Precision:", round(precision_score(test_y, predicted_labels), 2))
-print("Recall   :", round(recall_score(test_y, predicted_labels), 2))
-print("F1 Score :", round(f1_score(test_y, predicted_labels), 2))
+print("Precision:", round(precision_score(test_y, predicted_labels, pos_label='spam'), 2))
+print("Recall   :", round(recall_score(test_y, predicted_labels, pos_label='spam'), 2))
+print("F1 Score :", round(f1_score(test_y, predicted_labels, pos_label='spam'), 2))
 
+matrix = confusion_matrix(test_y, predicted_labels, labels=['ham', 'spam'])
+print("\nConfusion Matrix (rows=Actual, cols=Predicted):")
+print(f"              ham   spam")
+print(f"  ham     {matrix[0]}")
+print(f"  spam    {matrix[1]}")
 
-matrix = confusion_matrix(test_y, predicted_labels)
-print("\nConfusion Matrix:")
-print(matrix)
+# Bug fix: use .loc not .iloc
+test_messages = email_df.loc[test_y.index]['Message'].values
 
-test_messages = email_df.iloc[test_y.index]['Message'].values
-
-print("\nMisclassified Emails:")
+print("\nMisclassified Emails (first 5):")
 found = False
+count = 0
 
 for msg, actual, predicted in zip(test_messages, test_y, predicted_labels):
     if actual != predicted:
         found = True
-        print(f"Email: {msg}")
-        print(f"Actual: {actual}, Predicted: {predicted}\n")
+        count += 1
+        print(f"Email    : {msg}")
+        print(f"Actual   : {actual}  |  Predicted: {predicted}\n")
+        if count == 5:
+            break
 
 if not found:
     print("No misclassified emails.")
 ```
 # Output
-<img width="590" height="486" alt="Screenshot 2026-06-30 200158" src="https://github.com/user-attachments/assets/27efb051-20e4-49da-9863-9f4da1a2f715" />
+<img width="1653" height="717" alt="image" src="https://github.com/user-attachments/assets/1a38fe5f-bd8f-43e7-8ef0-d553f4a3f03b" />
+
 
